@@ -4,15 +4,15 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
-#include "ProjectBGameMode.generated.h"
+#include "PBGameMode.generated.h"
 
 UCLASS(minimalapi)
-class AProjectBGameMode : public AGameModeBase
+class APBGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 
 public:
-	AProjectBGameMode();
+	APBGameMode();
 };
 
 

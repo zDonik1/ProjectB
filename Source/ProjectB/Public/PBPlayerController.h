@@ -4,15 +4,15 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
-#include "ProjectBPlayerController.generated.h"
+#include "PBPlayerController.generated.h"
 
 UCLASS()
-class AProjectBPlayerController : public APlayerController
+class APBPlayerController : public APlayerController
 {
 	GENERATED_BODY()
 
 public:
-	AProjectBPlayerController();
+	APBPlayerController();
 
 protected:
 	/** True if the controlled character should navigate to the mouse cursor. */

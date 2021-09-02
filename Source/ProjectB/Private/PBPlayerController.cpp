@@ -1,19 +1,19 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-#include "ProjectBPlayerController.h"
+#include "PBPlayerController.h"
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "Runtime/Engine/Classes/Components/DecalComponent.h"
 #include "HeadMountedDisplayFunctionLibrary.h"
-#include "ProjectBCharacter.h"
+#include "PBCharacter.h"
 #include "Engine/World.h"
 
-AProjectBPlayerController::AProjectBPlayerController()
+APBPlayerController::APBPlayerController()
 {
 	bShowMouseCursor = true;
 	DefaultMouseCursor = EMouseCursor::Crosshairs;
 }
 
-void AProjectBPlayerController::PlayerTick(float DeltaTime)
+void APBPlayerController::PlayerTick(float DeltaTime)
 {
 	Super::PlayerTick(DeltaTime);
 
@@ -24,31 +24,31 @@ void AProjectBPlayerController::PlayerTick(float DeltaTime)
 	}
 }
 
-void AProjectBPlayerController::SetupInputComponent()
+void APBPlayerController::SetupInputComponent()
 {
 	// set up gameplay key bindings
 	Super::SetupInputComponent();
 
-	InputComponent->BindAction("SetDestination", IE_Pressed, this, &AProjectBPlayerController::OnSetDestinationPressed);
-	InputComponent->BindAction("SetDestination", IE_Released, this, &AProjectBPlayerController::OnSetDestinationReleased);
+	InputComponent->BindAction("SetDestination", IE_Pressed, this, &APBPlayerController::OnSetDestinationPressed);
+	InputComponent->BindAction("SetDestination", IE_Released, this, &APBPlayerController::OnSetDestinationReleased);
 
 	// support touch devices 
-	InputComponent->BindTouch(EInputEvent::IE_Pressed, this, &AProjectBPlayerController::MoveToTouchLocation);
-	InputComponent->BindTouch(EInputEvent::IE_Repeat, this, &AProjectBPlayerController::MoveToTouchLocation);
+	InputComponent->BindTouch(EInputEvent::IE_Pressed, this, &APBPlayerController::MoveToTouchLocation);
+	InputComponent->BindTouch(EInputEvent::IE_Repeat, this, &APBPlayerController::MoveToTouchLocation);
 
-	InputComponent->BindAction("ResetVR", IE_Pressed, this, &AProjectBPlayerController::OnResetVR);
+	InputComponent->BindAction("ResetVR", IE_Pressed, this, &APBPlayerController::OnResetVR);
 }
 
-void AProjectBPlayerController::OnResetVR()
+void APBPlayerController::OnResetVR()
 {
 	UHeadMountedDisplayFunctionLibrary::ResetOrientationAndPosition();
 }
 
-void AProjectBPlayerController::MoveToMouseCursor()
+void APBPlayerController::MoveToMouseCursor()
 {
 	if (UHeadMountedDisplayFunctionLibrary::IsHeadMountedDisplayEnabled())
 	{
-		if (AProjectBCharacter* MyPawn = Cast<AProjectBCharacter>(GetPawn()))
+		if (APBCharacter* MyPawn = Cast<APBCharacter>(GetPawn()))
 		{
 			if (MyPawn->GetCursorToWorld())
 			{
@@ -70,7 +70,7 @@ void AProjectBPlayerController::MoveToMouseCursor()
 	}
 }
 
-void AProjectBPlayerController::MoveToTouchLocation(const ETouchIndex::Type FingerIndex, const FVector Location)
+void APBPlayerController::MoveToTouchLocation(const ETouchIndex::Type FingerIndex, const FVector Location)
 {
 	FVector2D ScreenSpaceLocation(Location);
 
@@ -84,7 +84,7 @@ void AProjectBPlayerController::MoveToTouchLocation(const ETouchIndex::Type Fing
 	}
 }
 
-void AProjectBPlayerController::SetNewMoveDestination(const FVector DestLocation)
+void APBPlayerController::SetNewMoveDestination(const FVector DestLocation)
 {
 	APawn* const MyPawn = GetPawn();
 	if (MyPawn)
@@ -99,13 +99,13 @@ void AProjectBPlayerController::SetNewMoveDestination(const FVector DestLocation
 	}
 }
 
-void AProjectBPlayerController::OnSetDestinationPressed()
+void APBPlayerController::OnSetDestinationPressed()
 {
 	// set flag to keep updating destination until released
 	bMoveToMouseCursor = true;
 }
 
-void AProjectBPlayerController::OnSetDestinationReleased()
+void APBPlayerController::OnSetDestinationReleased()
 {
 	// clear flag to indicate we should stop updating the destination
 	bMoveToMouseCursor = false;

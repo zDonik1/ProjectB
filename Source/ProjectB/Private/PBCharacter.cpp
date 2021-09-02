@@ -1,6 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-#include "ProjectBCharacter.h"
+#include "PBCharacter.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Camera/CameraComponent.h"
 #include "Components/DecalComponent.h"
@@ -12,7 +12,7 @@
 #include "Materials/Material.h"
 #include "Engine/World.h"
 
-AProjectBCharacter::AProjectBCharacter()
+APBCharacter::APBCharacter()
 {
 	// Set size for player capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
@@ -52,7 +52,7 @@ AProjectBCharacter::AProjectBCharacter()
 	PrimaryActorTick.bStartWithTickEnabled = true;
 }
 
-void AProjectBCharacter::Tick(float DeltaSeconds)
+void APBCharacter::Tick(float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);
 

@@ -4,15 +4,15 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-#include "ProjectBCharacter.generated.h"
+#include "PBCharacter.generated.h"
 
 UCLASS(Blueprintable)
-class AProjectBCharacter : public ACharacter
+class APBCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
 public:
-	AProjectBCharacter();
+	APBCharacter();
 
 	// Called every frame.
 	virtual void Tick(float DeltaSeconds) override;
