@@ -11,6 +11,9 @@
 #include "HeadMountedDisplayFunctionLibrary.h"
 #include "Materials/Material.h"
 #include "Engine/World.h"
+#include "Abilities/PBAbilitySystemComponent.h"
+#include "Abilities/PBHealthAttributeSet.h"
+#include "Abilities/PBGameplayAbility.h"
 
 APBCharacter::APBCharacter()
 {
@@ -50,6 +53,13 @@ APBCharacter::APBCharacter()
 	// Activate ticking in order to update the cursor every frame.
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
+
+	// Init AbilitySystemComponent
+	AbilitySystemComponent = CreateDefaultSubobject<UPBAbilitySystemComponent>("AbilitySystemComp");
+	AbilitySystemComponent->SetIsReplicated(true);
+	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Minimal);
+
+	HealthAttribute = CreateDefaultSubobject<UPBHealthAttributeSet>("Health Attribute");
 }
 
 void APBCharacter::Tick(float DeltaSeconds)
@@ -81,5 +91,76 @@ void APBCharacter::Tick(float DeltaSeconds)
 			CursorToWorld->SetWorldLocation(TraceHitResult.Location);
 			CursorToWorld->SetWorldRotation(CursorR);
 		}
+	}
+}
+
+class UAbilitySystemComponent *APBCharacter::GetAbilitySystemComponent() const
+{
+	return AbilitySystemComponent;
+}
+
+void APBCharacter::SetupPlayerInputComponent(class UInputComponent *PlayerInputComponent)
+{
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+	TryInitAbilityInputBinds();
+}
+
+void APBCharacter::InitializeAttributes()
+{
+	if (AbilitySystemComponent && DefaultAttributeEffect)
+	{
+		FGameplayEffectContextHandle EffectContext = AbilitySystemComponent->MakeEffectContext();
+		EffectContext.AddSourceObject(this);
+
+		FGameplayEffectSpecHandle SpecHandle = AbilitySystemComponent->MakeOutgoingSpec(DefaultAttributeEffect, 1, EffectContext);
+		if (SpecHandle.IsValid())
+		{
+			FActiveGameplayEffectHandle GEHandle = AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+		}
+	}
+}
+
+void APBCharacter::GiveAbilities()
+{
+	if (HasAuthority() && AbilitySystemComponent)
+	{
+		for (auto &StartupAbility : DefaultAbilities)
+		{
+			AbilitySystemComponent->GiveAbility(
+				FGameplayAbilitySpec(StartupAbility, 1, static_cast<int32>(StartupAbility.GetDefaultObject()->AbilityInputID), this));
+		}
+	}
+}
+
+void APBCharacter::PossessedBy(AController *NewController)
+{
+	Super::PossessedBy(NewController);
+
+	// Server AbilitySystem init
+	AbilitySystemComponent->InitAbilityActorInfo(this, this);
+
+	InitializeAttributes();
+	GiveAbilities();
+}
+
+void APBCharacter::OnRep_PlayerState()
+{
+	Super::OnRep_PlayerState();
+
+	// Client AbiiltySystem init
+	AbilitySystemComponent->InitAbilityActorInfo(this, this);
+	InitializeAttributes();
+	TryInitAbilityInputBinds();
+}
+
+void APBCharacter::TryInitAbilityInputBinds()
+{
+	if (AbilitySystemComponent && InputComponent)
+	{
+		const FGameplayAbilityInputBinds Binds("Confirm", "Cancel", "EPBAbilityInputID",
+											   static_cast<int32>(EPBAbilityInputID::Confirm),
+											   static_cast<int32>(EPBAbilityInputID::Cancel));
+		AbilitySystemComponent->BindAbilityActivationToInputComponent(InputComponent, Binds);
 	}
 }
