@@ -19,8 +19,21 @@ public:
 	virtual void InputPressed(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo *ActorInfo,
 							  const FGameplayAbilityActivationInfo ActivationInfo) override;
 
+	// Initializes the primary instance (if Actor Instanced), called when ability is granted
+	void InitInstance();
+
+	// Works only if actor instanced
+	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "InitInstance"))
+	void BlueprintInitInstance();
+
 	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "InputPressed"))
 	void BlueprintInputPressed();
+
+	UFUNCTION(BlueprintCallable)
+	void AddTag(FGameplayTag Tag);
+
+	UFUNCTION(BlueprintCallable)
+	void RemoveTag(FGameplayTag Tag);
 
 public:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Ability")

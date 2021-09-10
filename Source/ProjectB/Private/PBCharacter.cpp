@@ -80,10 +80,7 @@ void APBCharacter::BeginPlay()
 		UE_LOG(LogTemp, Error, TEXT("AbilitySystemComponent not initialized"));
 	}
 	InitializeAttributes();
-	if (HasAuthority())
-	{
-		GiveAbilities();
-	}
+	GrantAbilities();
 }
 
 void APBCharacter::Tick(float DeltaSeconds)
@@ -145,15 +142,35 @@ void APBCharacter::InitializeAttributes()
 	}
 }
 
-void APBCharacter::GiveAbilities()
+void APBCharacter::GrantAbilities()
 {
 	if (HasAuthority() && AbilitySystemComponent)
 	{
 		for (auto &StartupAbility : DefaultAbilities)
 		{
-			AbilitySystemComponent->GiveAbility(
-				FGameplayAbilitySpec(StartupAbility, 1, static_cast<int32>(StartupAbility.GetDefaultObject()->AbilityInputID), this));
+			GrantAbilityUnsafe(StartupAbility);
 		}
+	}
+}
+
+void APBCharacter::GrantAbility(TSubclassOf<UPBGameplayAbility> Ability)
+{
+	if (HasAuthority() && AbilitySystemComponent)
+	{
+		GrantAbilityUnsafe(Ability);
+	}
+}
+
+void APBCharacter::GrantAbilityUnsafe(TSubclassOf<UPBGameplayAbility> Ability)
+{
+	AbilitySystemComponent->GiveAbility(
+		FGameplayAbilitySpec(Ability, 1, static_cast<int32>(Ability.GetDefaultObject()->AbilityInputID), this));
+
+	// Initialize primary instance
+	auto Instance = Cast<UPBGameplayAbility>(AbilitySystemComponent->GetAbilityPrimaryInstanceByClass(Ability));
+	if (IsValid(Instance))
+	{
+		Instance->InitInstance();
 	}
 }
 

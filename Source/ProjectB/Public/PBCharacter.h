@@ -36,7 +36,12 @@ public:
 	virtual void SetupPlayerInputComponent(UInputComponent *PlayerInputComponent) override;
 
 	virtual void InitializeAttributes();
-	virtual void GiveAbilities();
+	virtual void GrantAbilities();
+
+	UFUNCTION(BlueprintCallable, Category = "Ability")
+	void GrantAbility(TSubclassOf<UPBGameplayAbility> Ability);
+
+	void GrantAbilityUnsafe(TSubclassOf<UPBGameplayAbility> Ability);
 
 	void OnHealthUpdated(const FOnAttributeChangeData &Data);
 

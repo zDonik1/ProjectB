@@ -15,6 +15,36 @@ void UPBAbilitySystemComponent::CancelAbilityByTag(FGameplayTag Tag)
     CancelAbilities(&Tags);
 }
 
+void UPBAbilitySystemComponent::AddTag(FGameplayTag Tag)
+{
+    AddLooseGameplayTag(Tag);
+}
+
+void UPBAbilitySystemComponent::RemoveTag(FGameplayTag Tag)
+{
+    RemoveLooseGameplayTag(Tag);
+}
+
+bool UPBAbilitySystemComponent::HasActiveAbilityWithTag(FGameplayTag Tag)
+{
+    TArray<FGameplayAbilitySpec *> AbilitySpecs;
+    GetActivatableGameplayAbilitySpecsByAllMatchingTags(FGameplayTagContainer(Tag), AbilitySpecs);
+    return AbilitySpecs.Num() != 0 && AbilitySpecs.Last()->IsActive();
+}
+
+UGameplayAbility *UPBAbilitySystemComponent::GetAbilityPrimaryInstanceByClass(TSubclassOf<UGameplayAbility> Ability)
+{
+    auto AbilitySpecs = GetActivatableAbilities();
+    for (auto &Spec : AbilitySpecs)
+    {
+        if (Spec.Ability == Ability.GetDefaultObject())
+        {
+            return Spec.GetPrimaryInstance();
+        }
+    }
+    return nullptr;
+}
+
 void UPBAbilitySystemComponent::AbilityLocalInputPressed(int32 InputID)
 {
     // Consume the input if this InputID is overloaded with GenericConfirm/Cancel and the GenericConfim/Cancel callback is bound
@@ -79,4 +109,9 @@ void UPBAbilitySystemComponent::AbilitySpecInputPressed(FGameplayAbilitySpec &Sp
             Instance->InputPressed(Spec.Handle, AbilityActorInfo.Get(), Spec.ActivationInfo);
         }
     }
+}
+
+void UPBAbilitySystemComponent::OnTagUpdated(const FGameplayTag &Tag, bool TagExists)
+{
+    OnTagChanged.Broadcast(Tag, TagExists);
 }

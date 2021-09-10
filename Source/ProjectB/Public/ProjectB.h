@@ -11,6 +11,7 @@ enum class EPBAbilityInputID : uint8
 {
     None,
     Cancel,
-    Confirm, 
+    Confirm,
     BasicAttack,
+    Dash,
 };
