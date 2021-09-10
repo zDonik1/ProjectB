@@ -8,9 +8,15 @@ void UPBHealthAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
     DOREPLIFETIME_CONDITION_NOTIFY(UPBHealthAttributeSet, Health, COND_None, REPNOTIFY_Always);
+    DOREPLIFETIME_CONDITION_NOTIFY(UPBHealthAttributeSet, MaxHealth, COND_None, REPNOTIFY_Always);
 }
 
 void UPBHealthAttributeSet::OnRep_Health(const FGameplayAttributeData &OldHealth)
 {
     GAMEPLAYATTRIBUTE_REPNOTIFY(UPBHealthAttributeSet, Health, OldHealth);
+}
+
+void UPBHealthAttributeSet::OnRep_MaxHealth(const FGameplayAttributeData &OldMaxHealth)
+{
+    GAMEPLAYATTRIBUTE_REPNOTIFY(UPBHealthAttributeSet, MaxHealth, OldMaxHealth);
 }

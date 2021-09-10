@@ -3,3 +3,8 @@
 
 #include "Abilities/PBGameplayAbility.h"
 
+void UPBGameplayAbility::InputPressed(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo *ActorInfo,
+                                      const FGameplayAbilityActivationInfo ActivationInfo)
+{
+    BlueprintInputPressed();
+}

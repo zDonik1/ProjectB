@@ -6,7 +6,10 @@
 #include "GameFramework/Character.h"
 #include "AbilitySystemInterface.h"
 #include <GameplayEffectTypes.h>
+#include "Delegates/DelegateCombinations.h"
 #include "PBCharacter.generated.h"
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAttributeChange, float, AttributeValue);
 
 UCLASS(Blueprintable)
 class APBCharacter : public ACharacter, public IAbilitySystemInterface
@@ -15,6 +18,8 @@ class APBCharacter : public ACharacter, public IAbilitySystemInterface
 
 public:
 	APBCharacter();
+
+	virtual void BeginPlay() override;
 
 	// Called every frame.
 	virtual void Tick(float DeltaSeconds) override;
@@ -28,13 +33,12 @@ public:
 
 	virtual class UAbilitySystemComponent *GetAbilitySystemComponent() const override;
 
-	virtual void SetupPlayerInputComponent(class UInputComponent *PlayerInputComponent) override;
+	virtual void SetupPlayerInputComponent(UInputComponent *PlayerInputComponent) override;
 
 	virtual void InitializeAttributes();
 	virtual void GiveAbilities();
 
-	virtual void PossessedBy(AController *NewController) override;
-	virtual void OnRep_PlayerState() override;
+	void OnHealthUpdated(const FOnAttributeChangeData &Data);
 
 private:
 	void TryInitAbilityInputBinds();
@@ -45,6 +49,9 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities");
 	TArray<TSubclassOf<class UPBGameplayAbility>> DefaultAbilities;
+
+	UPROPERTY(BlueprintAssignable, Category = "Abilities")
+	FAttributeChange OnHealthChange;
 
 private:
 	/** Top down camera */
@@ -63,5 +70,5 @@ private:
 	class UPBAbilitySystemComponent *AbilitySystemComponent;
 
 	UPROPERTY()
-	class UPBHealthAttributeSet *HealthAttribute;
+	class UPBHealthAttributeSet *HealthAttributeSet;
 };

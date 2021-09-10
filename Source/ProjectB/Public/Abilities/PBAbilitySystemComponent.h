@@ -13,5 +13,14 @@ UCLASS()
 class PROJECTB_API UPBAbilitySystemComponent : public UAbilitySystemComponent
 {
 	GENERATED_BODY()
-	
+
+public:
+	UFUNCTION(BlueprintCallable)
+	void CancelAbilityByClass(TSubclassOf<UGameplayAbility> Ability);
+
+	UFUNCTION(BlueprintCallable)
+	void CancelAbilityByTag(FGameplayTag Tag);
+
+	virtual void AbilityLocalInputPressed(int32 InputID) override;
+	virtual void AbilitySpecInputPressed(FGameplayAbilitySpec &Spec) override;
 };

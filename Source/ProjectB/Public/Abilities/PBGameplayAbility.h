@@ -16,6 +16,16 @@ class PROJECTB_API UPBGameplayAbility : public UGameplayAbility
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Ability")
+	virtual void InputPressed(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo *ActorInfo,
+							  const FGameplayAbilityActivationInfo ActivationInfo) override;
+
+	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "InputPressed"))
+	void BlueprintInputPressed();
+
+public:
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Ability")
 	EPBAbilityInputID AbilityInputID = EPBAbilityInputID::None;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Ability")
+	bool bActivateOnInputPressed = true;
 };

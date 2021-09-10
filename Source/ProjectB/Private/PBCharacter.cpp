@@ -59,7 +59,31 @@ APBCharacter::APBCharacter()
 	AbilitySystemComponent->SetIsReplicated(true);
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Minimal);
 
-	HealthAttribute = CreateDefaultSubobject<UPBHealthAttributeSet>("Health Attribute");
+	HealthAttributeSet = CreateDefaultSubobject<UPBHealthAttributeSet>("Health Attribute");
+	HealthAttributeSet->InitMaxHealth(100.f);
+	HealthAttributeSet->InitHealth(HealthAttributeSet->GetMaxHealth());
+}
+
+void APBCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+
+	// Initializing Ability System
+	if (AbilitySystemComponent)
+	{
+		AbilitySystemComponent->InitAbilityActorInfo(this, this);
+		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(UPBHealthAttributeSet::GetHealthAttribute())
+			.AddUObject(this, &APBCharacter::OnHealthUpdated);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("AbilitySystemComponent not initialized"));
+	}
+	InitializeAttributes();
+	if (HasAuthority())
+	{
+		GiveAbilities();
+	}
 }
 
 void APBCharacter::Tick(float DeltaSeconds)
@@ -99,7 +123,7 @@ class UAbilitySystemComponent *APBCharacter::GetAbilitySystemComponent() const
 	return AbilitySystemComponent;
 }
 
-void APBCharacter::SetupPlayerInputComponent(class UInputComponent *PlayerInputComponent)
+void APBCharacter::SetupPlayerInputComponent(UInputComponent *PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
@@ -133,25 +157,9 @@ void APBCharacter::GiveAbilities()
 	}
 }
 
-void APBCharacter::PossessedBy(AController *NewController)
+void APBCharacter::OnHealthUpdated(const FOnAttributeChangeData &Data)
 {
-	Super::PossessedBy(NewController);
-
-	// Server AbilitySystem init
-	AbilitySystemComponent->InitAbilityActorInfo(this, this);
-
-	InitializeAttributes();
-	GiveAbilities();
-}
-
-void APBCharacter::OnRep_PlayerState()
-{
-	Super::OnRep_PlayerState();
-
-	// Client AbiiltySystem init
-	AbilitySystemComponent->InitAbilityActorInfo(this, this);
-	InitializeAttributes();
-	TryInitAbilityInputBinds();
+	OnHealthChange.Broadcast(Data.NewValue);
 }
 
 void APBCharacter::TryInitAbilityInputBinds()
