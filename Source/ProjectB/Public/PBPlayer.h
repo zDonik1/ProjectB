@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// @author Doniyorbek Tokhirov <tokhirovdoniyor@gmail.com> 2021
 
 #pragma once
 

@@ -1,4 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+// @author Doniyorbek Tokhirov <tokhirovdoniyor@gmail.com> 2021
 
 using UnrealBuildTool;
 using System.Collections.Generic;
